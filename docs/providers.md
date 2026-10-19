@@ -13,6 +13,8 @@ GraphPilot uses [LiteLLM's completion interface](https://docs.litellm.ai/docs/) 
 
 Provider examples are configuration routes, not evidence of live compatibility testing. The adapter forwarding contract is tested offline. Other LiteLLM providers can be selected the same way, subject to their credentials, optional SDKs and model capabilities.
 
+Groq uses LiteLLM's OpenAI-compatible transport with the Groq endpoint and `GROQ_API_KEY`; the request still goes to Groq, not OpenAI. This avoids a response-parsing regression in LiteLLM 1.106.0. The Groq model prefix and configuration remain unchanged for users. Local HTTP tests cover this actual transport, approval/resume, and 401/429 errors. Other providers retain their native LiteLLM adapters. MCP 2.3+ is constrained compatibly across the agent and companion tool.
+
 ## Custom gateway
 
 ```dotenv

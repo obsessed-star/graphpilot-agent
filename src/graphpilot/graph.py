@@ -12,7 +12,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
 from graphpilot.config import Settings
-from graphpilot.provider import Provider
+from graphpilot.provider import Provider, ProviderError
 from graphpilot.tools import Registry
 
 SYSTEM = """You are GraphPilot, an assistant that completes tasks through inspectable tools.
@@ -102,13 +102,14 @@ def build_graph(provider: Provider, registry: Registry, settings: Settings, chec
                     raise ValueError("Malformed tool call")
         except Exception as exc:
             # Never persist a raw provider error that could echo secrets or request bodies.
+            detail = str(exc) if isinstance(exc, ProviderError) else type(exc).__name__
             return {
                 "model_calls": state["model_calls"] + 1,
                 "status": "provider_error",
                 "messages": [
                     {
                         "role": "assistant",
-                        "content": f"Model çağrısı başarısız ({type(exc).__name__}). "
+                        "content": f"Model çağrısı başarısız ({detail}). "
                         "Anahtar, model erişimi, kota ve tool desteğini kontrol edin.",
                     }
                 ],

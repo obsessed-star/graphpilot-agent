@@ -151,6 +151,8 @@ def main():
                 }
                 result = graph.invoke(Command(resume=decision), config)
             print_result(result)
+            if not result.get("__interrupt__") and result["status"] != "completed":
+                raise SystemExit(2)
     except (ValueError, OSError, EOFError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         raise SystemExit(2) from None

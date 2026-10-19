@@ -100,7 +100,7 @@ python -m pytest -q
 python -m build
 ```
 
-The integration test uses the actual phone controller over a deterministic USB transport fixture. It skips when the companion package is absent. CI includes a cross-repository integration job and Windows/Linux × Python 3.11/3.14 package checks. No API key or hardware is needed for CI.
+The integration test uses the actual phone controller over a deterministic USB transport fixture. It skips when the companion package is absent. Local HTTP integration tests also run real CLI processes and the LiteLLM adapter through approval/resume and 401/429 failures, using scripted responses. CI includes a cross-repository integration job and Windows/Linux × Python 3.11/3.14 package checks. No API key or hardware is needed for CI. Use version 0.1.1 or newer; the [validation record](docs/validation.md) documents defects found after the initial unit-only preview.
 
 [Architecture and tradeoffs](docs/architecture.md) · [Validation evidence](docs/validation.md) · [Security](SECURITY.md) · [Türkçe başlangıç](docs/tr.md)
 

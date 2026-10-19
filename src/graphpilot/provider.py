@@ -31,6 +31,17 @@ class LiteLLMProvider:
             "timeout": 45,
             "num_retries": 0,
         }
+        if self.settings.model.startswith("groq/"):
+            # Groq exposes the OpenAI chat protocol. LiteLLM 1.106.0's native
+            # Groq response parser raises when optional service_tier is absent.
+            # Use its public compatible transport, without patching SDK internals.
+            options["model"] = "openai/" + self.settings.model.removeprefix("groq/")
+            options["api_base"] = self.settings.api_base or "https://api.groq.com/openai/v1"
+            variable = self.settings.api_key_env or "GROQ_API_KEY"
+            key = os.getenv(variable)
+            if not key:
+                raise ProviderError(f"Missing key variable: {variable}")
+            options["api_key"] = key
         if tools:
             options["tools"] = tools
             options["tool_choice"] = "auto"

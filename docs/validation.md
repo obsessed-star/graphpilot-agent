@@ -1,19 +1,25 @@
 # Validation record
 
-Initial local validation: **19 October 2026**, Windows, Python 3.14.7.
+Latest local validation: **20 October 2026**, Windows, Python 3.14.7. Initial checks were performed on 19 October.
 
 | Check | Observed result |
 |---|---|
-| Agent tests with companion package installed | 23 passed |
+| Agent and companion tests together | 58 passed; see [validation.json](validation.json) |
 | Ruff lint and formatting | Passed |
 | Wheel and source distribution | Built successfully |
 | Real graph offline CLI demo | Approval suspended before a write; resume produced the expected file; zero live calls |
 | Persistent approval | SQLite checkpoint reopened in a new graph; approved operation executed |
 | Cross-project integration | Real LangGraph graph and Phone controller exercised together over fake USB transport |
+| Actual LiteLLM HTTP boundary | Real CLI processes complete approval/denial and SQLite resume against a local scripted HTTP server |
+| HTTP 401 and 429 | One request per failure, no retries, process exits with status 2 |
 | Live Groq | Not tested; operator key not yet provided |
 | Real USB phone | Not tested; device enumeration returned an empty list |
 
-The model/provider is mocked in tests. The graph, registry, argument validation, checkpoint storage and phone controller are real code. No test uses a paid model request. The stdio protocol and image-content checks belong to the companion package's test suite.
+Most unit tests inject a scripted provider. The HTTP integration tests also run the real LiteLLM adapter and CLI over loopback HTTP, with scripted model responses. The graph, registry, argument validation, checkpoint storage and phone controller are real code. No test uses a paid model request or demonstrates actual model reasoning. The stdio protocol and image-content checks belong to the companion package's test suite.
+
+## Defects found by the deeper HTTP check
+
+The initial 0.1.0 unit suite did not exercise the installed SDKs together over HTTP. LiteLLM 1.106.0's native Groq parser failed when optional `service_tier` metadata was absent; its tool pipeline also required MCP 2 types when an incompatible MCP 1 installation was present. Version 0.1.1 uses Groq's public OpenAI-compatible transport, explicitly depends on a compatible MCP SDK, and verifies the actual HTTP boundary. The CLI also now exits unsuccessfully for provider/budget failures instead of reporting shell success after a failed task. Use 0.1.1 or newer rather than the initial preview.
 
 Machine-readable check commands, local results and package hashes are in [validation.json](validation.json). Dependency versions are pinned in [requirements-dev.lock](../requirements-dev.lock). The source distribution hash records the local build at validation time; subsequent documentation commits can change a rebuilt source archive.
 

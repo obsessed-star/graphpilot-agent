@@ -159,7 +159,7 @@ def test_litellm_adapter_forwards_config_and_disables_retries(monkeypatch):
     )
     result = provider.complete([{"role": "user", "content": "x"}], [{"type": "function"}])
     assert captured["num_retries"] == 0 and captured["api_key"] == "not-a-real-key"
-    assert captured["model"] == "groq/test" and captured["api_base"] == "https://example.invalid/v1"
+    assert captured["model"] == "openai/test" and captured["api_base"] == "https://example.invalid/v1"
     assert result["message"] == answer("ok")
 
 

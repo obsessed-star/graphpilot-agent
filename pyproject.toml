@@ -4,12 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "graphpilot-agent"
-version = "0.1.0"
+version = "0.1.1"
 description = "A provider-neutral LangGraph agent with inspectable tool execution and Android control."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
-dependencies = ["langgraph>=1.0,<2", "langgraph-checkpoint-sqlite>=3,<4", "litellm>=1.80,<2", "python-dotenv>=1,<2", "jsonschema>=4,<5"]
+dependencies = ["langgraph>=1.0,<2", "langgraph-checkpoint-sqlite>=3,<4", "litellm>=1.80,<2", "python-dotenv>=1,<2", "jsonschema>=4,<5", "mcp>=2.3,<3"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.12,<1", "build>=1,<2"]
