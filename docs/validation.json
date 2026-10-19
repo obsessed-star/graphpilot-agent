@@ -1,39 +1,46 @@
 {
-  "date": "2026-10-19",
+  "date": "2026-10-20",
   "platform": "Windows",
   "python": "3.14.7",
+  "version": "0.1.1",
+  "project_test_cases": 27,
   "checks": [
     {
-      "command": "python -m ruff check .",
+      "command": "python -m pytest outputs/graphpilot-agent/tests outputs/usbphone-control/tests -q",
+      "command_root": "directory containing outputs",
       "exit_code": 0,
-      "summary": "All checks passed!"
+      "summary": "58 passed in 62.01s; real HTTP/CLI and MCP transport included"
     },
     {
-      "command": "python -m ruff format --check .",
-      "exit_code": 0,
-      "summary": "16 files already formatted"
+      "command": "ruff check outputs/graphpilot-agent outputs/usbphone-control",
+      "exit_code": 0
     },
     {
-      "command": "python -m pytest -q",
-      "exit_code": 0,
-      "summary": "23 passed in 6.33s"
+      "command": "ruff format --check outputs/graphpilot-agent outputs/usbphone-control",
+      "exit_code": 0
+    },
+    {
+      "command": "python -m pip check",
+      "exit_code": 0
     },
     {
       "command": "python -m build --outdir dist",
-      "exit_code": 0,
-      "summary": "Successfully built graphpilot_agent-0.1.0.tar.gz and graphpilot_agent-0.1.0-py3-none-any.whl"
+      "command_root": "repository",
+      "exit_code": 0
     }
   ],
   "artifacts": [
     {
-      "file": "graphpilot_agent-0.1.0-py3-none-any.whl",
-      "sha256": "b97b9b951835a4f5cf5489129afd8cd04229c4ce8997c0e9baf41e84e743221f"
+      "file": "graphpilot_agent-0.1.1-py3-none-any.whl",
+      "sha256": "92b40eff541869a3d5ee248462594abfd28b22a4c6fb75e2a0c55013f08ccb61"
     },
     {
-      "file": "graphpilot_agent-0.1.0.tar.gz",
-      "sha256": "9aefc26b54961bb36c1fba3c5f8a78456858f6539c1989e042c683f8fe9f6dfc"
+      "file": "graphpilot_agent-0.1.1.tar.gz",
+      "sha256": "3d633e2a934b229859640e57b8ef243ae1d6d44db6e8b5f099abfccf5651984b"
     }
   ],
   "live_provider_tested": false,
-  "real_usb_device_tested": false
+  "real_usb_device_tested": false,
+  "local_http_adapter_tested": true,
+  "mcp_sdk": "2.3.0"
 }
