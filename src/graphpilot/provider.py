@@ -25,8 +25,11 @@ class LiteLLMProvider:
 
         litellm.suppress_debug_info = True
         options = {
-            "model": self.settings.model, "messages": messages, "max_tokens": self.settings.max_tokens,
-            "timeout": 45, "num_retries": 0,
+            "model": self.settings.model,
+            "messages": messages,
+            "max_tokens": self.settings.max_tokens,
+            "timeout": 45,
+            "num_retries": 0,
         }
         if tools:
             options["tools"] = tools

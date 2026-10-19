@@ -17,9 +17,14 @@ class Tool:
     mutating: bool = False
 
     def schema(self):
-        return {"type": "function", "function": {
-            "name": self.name, "description": self.description, "parameters": self.parameters,
-        }}
+        return {
+            "type": "function",
+            "function": {
+                "name": self.name,
+                "description": self.description,
+                "parameters": self.parameters,
+            },
+        }
 
     def validate(self, args: dict):
         errors = list(Draft202012Validator(self.parameters).iter_errors(args))
@@ -51,8 +56,12 @@ class Registry:
 
 
 def obj(properties: dict, required: list[str] | None = None):
-    return {"type": "object", "properties": properties,
-            "required": required if required is not None else list(properties), "additionalProperties": False}
+    return {
+        "type": "object",
+        "properties": properties,
+        "required": required if required is not None else list(properties),
+        "additionalProperties": False,
+    }
 
 
 def workspace_tools(root: Path) -> Registry:
@@ -61,6 +70,8 @@ def workspace_tools(root: Path) -> Registry:
     registry = Registry()
 
     def resolve(path: str) -> Path:
+        if ":" in path or "\x00" in path:
+            raise ValueError("Invalid workspace path.")
         candidate = (root / path).resolve()
         if not candidate.is_relative_to(root):
             raise ValueError("Path escapes the workspace.")
@@ -94,34 +105,56 @@ def workspace_tools(root: Path) -> Registry:
 
     registry.add(Tool("list_files", "List top-level entries in the task workspace.", obj({}), list_files))
     path_schema = {"type": "string", "minLength": 1, "maxLength": 200}
-    registry.add(Tool("read_file", "Read a UTF-8 workspace file (up to 16 KB).",
-                      obj({"path": path_schema}), read_file))
-    registry.add(Tool("write_file", "Write a UTF-8 workspace file. Requires human approval.",
-                      obj({"path": path_schema, "content": {"type": "string", "maxLength": 16000}}),
-                      write_file, mutating=True))
+    registry.add(
+        Tool("read_file", "Read a UTF-8 workspace file (up to 16 KB).", obj({"path": path_schema}), read_file)
+    )
+    registry.add(
+        Tool(
+            "write_file",
+            "Write a UTF-8 workspace file. Requires human approval.",
+            obj({"path": path_schema, "content": {"type": "string", "maxLength": 16000}}),
+            write_file,
+            mutating=True,
+        )
+    )
     return registry
 
 
 def add_phone_tools(registry: Registry, phone):
-    registry.add(Tool("phone_observe", "Read USB phone screenshot and UI. Observe before every action.",
-                      obj({}), phone.observe))
+    registry.add(
+        Tool(
+            "phone_observe",
+            "Read USB phone screenshot and UI. Observe before every action.",
+            obj({}),
+            phone.observe,
+        )
+    )
     observation = {"type": "string", "pattern": "^[a-f0-9]{32}$"}
     integer = {"type": "integer", "minimum": 0}
     specs = {
         "tap": {"x": integer, "y": integer},
         "tap_element": {"index": integer},
-        "swipe": {**{k: integer for k in ("x1", "y1", "x2", "y2")},
-                  "duration_ms": {"type": "integer", "minimum": 50, "maximum": 3000}},
+        "swipe": {
+            **{k: integer for k in ("x1", "y1", "x2", "y2")},
+            "duration_ms": {"type": "integer", "minimum": 50, "maximum": 3000},
+        },
         "type_text": {"text": {"type": "string", "minLength": 1, "maxLength": 1000}},
         "key": {"key": {"type": "string", "enum": ["HOME", "BACK", "ENTER", "BACKSPACE", "RECENTS"]}},
         "launch": {"package": {"type": "string", "minLength": 3, "maxLength": 200}},
     }
     for action, properties in specs.items():
+
         def handler(observation_id, _action=action, **kwargs):
             # After a durable agent restart the Phone instance has no in-memory observation.
             phone.restore(observation_id)
             return phone.act(_action, observation_id, **kwargs)
-        registry.add(Tool(
-            f"phone_{action}", f"Android {action}; use the latest observation ID. Requires human approval.",
-            obj({"observation_id": observation, **properties}), handler, mutating=True,
-        ))
+
+        registry.add(
+            Tool(
+                f"phone_{action}",
+                f"Android {action}; use the latest observation ID. Requires human approval.",
+                obj({"observation_id": observation, **properties}),
+                handler,
+                mutating=True,
+            )
+        )

@@ -31,8 +31,13 @@ def make_registry(workspace: Path, phone_enabled: bool, state_dir: Path):
 
 def print_result(result):
     if result.get("__interrupt__"):
-        print(json.dumps({"status": "awaiting_approval", "request": result["__interrupt__"][0].value},
-                         ensure_ascii=False, indent=2))
+        print(
+            json.dumps(
+                {"status": "awaiting_approval", "request": result["__interrupt__"][0].value},
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
     else:
         last = result["messages"][-1]
         print(last.get("content") or "[No text response]")
@@ -40,7 +45,9 @@ def print_result(result):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Provider-neutral LangGraph agent with durable tool approval.")
+    parser = argparse.ArgumentParser(
+        description="Provider-neutral LangGraph agent with durable tool approval."
+    )
     parser.add_argument("--env-file", default=".env")
     parser.add_argument("--state-dir", default=".graphpilot")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -78,37 +85,70 @@ def main():
             return
         if args.command == "demo":
             from graphpilot.demo import run_demo
+
             print(json.dumps(run_demo(), indent=2))
             return
         settings = Settings.from_env()
         if args.command == "doctor":
             variable = settings.api_key_env or {
-                "groq": "GROQ_API_KEY", "openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY",
-                "gemini": "GEMINI_API_KEY", "azure": "AZURE_API_KEY",
+                "groq": "GROQ_API_KEY",
+                "openai": "OPENAI_API_KEY",
+                "anthropic": "ANTHROPIC_API_KEY",
+                "gemini": "GEMINI_API_KEY",
+                "azure": "AZURE_API_KEY",
             }.get(settings.model.split("/")[0])
-            print(json.dumps({"model": settings.model, "key_variable": variable,
-                              "key_present": bool(os.getenv(variable)) if variable else None,
-                              "vision_enabled": settings.vision, "live_model_calls": 0}, indent=2))
+            print(
+                json.dumps(
+                    {
+                        "model": settings.model,
+                        "key_variable": variable,
+                        "key_present": bool(os.getenv(variable)) if variable else None,
+                        "vision_enabled": settings.vision,
+                        "live_model_calls": 0,
+                    },
+                    indent=2,
+                )
+            )
             return
         state_dir = Path(args.state_dir)
         state_dir.mkdir(parents=True, exist_ok=True)
         registry = make_registry(Path(args.workspace), args.phone, state_dir)
-        config = {"configurable": {"thread_id": args.session},
-                  "recursion_limit": settings.max_model_calls * 3 + 10}
+        runtime = {
+            "workspace": str(Path(args.workspace).resolve()),
+            "phone": args.phone,
+            "captures": str((state_dir / "phone").resolve()),
+            "model": settings.model,
+        }
+        config = {
+            "configurable": {"thread_id": args.session},
+            "recursion_limit": settings.max_model_calls * 3 + 10,
+        }
         with SqliteSaver.from_conn_string(str(state_dir / "sessions.sqlite")) as saver:
             graph = build_graph(LiteLLMProvider(settings), registry, settings, saver)
             previous = graph.get_state(config)
             pending = bool(previous.next)
+            if previous.values.get("runtime") and previous.values["runtime"] != runtime:
+                raise ValueError(
+                    "Session runtime differs. Reuse its workspace/model/phone flags or a new session."
+                )
             if args.command == "run" and pending:
                 raise ValueError("This session awaits approval. Use resume approve/deny before a new task.")
             if args.command == "resume" and not pending:
                 raise ValueError("This session has no pending action.")
-            value = (initial_state(args.prompt) if args.command == "run"
-                     else Command(resume=args.decision == "approve"))
+            value = (
+                {**initial_state(args.prompt), "runtime": runtime}
+                if args.command == "run"
+                else Command(resume=args.decision == "approve")
+            )
             result = graph.invoke(value, config)
             while result.get("__interrupt__") and not args.non_interactive:
                 print_result(result)
-                decision = input("Bu işlemi onaylıyor musun? [e/H]: ").strip().lower() in {"e", "evet", "y", "yes"}
+                decision = input("Bu işlemi onaylıyor musun? [e/H]: ").strip().lower() in {
+                    "e",
+                    "evet",
+                    "y",
+                    "yes",
+                }
                 result = graph.invoke(Command(resume=decision), config)
             print_result(result)
     except (ValueError, OSError, EOFError) as exc:

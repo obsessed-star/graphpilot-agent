@@ -35,7 +35,9 @@ def request_messages(messages: list[dict]) -> list[dict]:
     result = []
     for i, message in enumerate(messages):
         if isinstance(message.get("content"), list) and i != last_image:
-            result.append({"role": "user", "content": "[Earlier screenshot omitted; see its tool observation.]"})
+            result.append(
+                {"role": "user", "content": "[Earlier screenshot omitted; see its tool observation.]"}
+            )
         else:
             result.append(message)
     return result
@@ -56,34 +58,67 @@ class State(TypedDict):
     tool_calls: int
     usage: Annotated[list[dict], operator.add]
     status: str
+    runtime: dict
 
 
 def build_graph(provider: Provider, registry: Registry, settings: Settings, checkpointer=None):
     def model(state: State):
         if state["model_calls"] >= settings.max_model_calls:
-            return {"status": "model_call_limit", "messages": [
-                {"role": "assistant", "content": "Model çağrı sınırına ulaşıldı; görev tamamlanmadı."},
-            ]}
+            return {
+                "status": "model_call_limit",
+                "messages": [
+                    {"role": "assistant", "content": "Model çağrı sınırına ulaşıldı; görev tamamlanmadı."},
+                ],
+            }
         messages = [{"role": "system", "content": SYSTEM}, *request_messages(state["messages"])]
         # Deterministic local byte/character cap, not an inaccurate claim of exact token accounting.
         if text_size([messages, registry.schemas()]) > settings.max_input_chars:
-            return {"status": "input_limit", "messages": [
-                {"role": "assistant", "content": "Girdi sınırına ulaşıldı. Daha dar bir görev veya yeni oturum açın."},
-            ]}
+            return {
+                "status": "input_limit",
+                "messages": [
+                    {
+                        "role": "assistant",
+                        "content": "Girdi sınırına ulaşıldı. Daha dar bir görev veya yeni oturum açın.",
+                    },
+                ],
+            }
         try:
             response = provider.complete(messages, registry.schemas())
             message = response["message"]
             if message.get("role") != "assistant":
                 raise ValueError("Provider did not return an assistant message")
+            calls = message.get("tool_calls") or []
+            if not isinstance(calls, list) or len(calls) > 16:
+                raise ValueError("Invalid tool-call envelope")
+            for call in calls:
+                if (
+                    not isinstance(call, dict)
+                    or not isinstance(call.get("id"), str)
+                    or not call["id"]
+                    or not isinstance(call.get("function"), dict)
+                    or not isinstance(call["function"].get("name"), str)
+                    or not isinstance(call["function"].get("arguments"), str)
+                ):
+                    raise ValueError("Malformed tool call")
         except Exception as exc:
             # Never persist a raw provider error that could echo secrets or request bodies.
-            return {"model_calls": state["model_calls"] + 1, "status": "provider_error",
-                    "messages": [{"role": "assistant", "content":
-                                  f"Model çağrısı başarısız ({type(exc).__name__}). "
-                                  "Anahtar, model erişimi, kota ve tool desteğini kontrol edin."}]}
-        return {"messages": [message], "model_calls": state["model_calls"] + 1,
-                "usage": [response.get("usage", {})],
-                "status": "running" if message.get("tool_calls") else "completed"}
+            return {
+                "model_calls": state["model_calls"] + 1,
+                "status": "provider_error",
+                "messages": [
+                    {
+                        "role": "assistant",
+                        "content": f"Model çağrısı başarısız ({type(exc).__name__}). "
+                        "Anahtar, model erişimi, kota ve tool desteğini kontrol edin.",
+                    }
+                ],
+            }
+        return {
+            "messages": [message],
+            "model_calls": state["model_calls"] + 1,
+            "usage": [response.get("usage", {})],
+            "status": "running" if message.get("tool_calls") else "completed",
+        }
 
     def route(state: State):
         if state["status"] != "running":
@@ -110,8 +145,12 @@ def build_graph(provider: Provider, registry: Registry, settings: Settings, chec
                     # Interrupt must be outside exception handlers: LangGraph suspends this node here.
                     approved = True
                     if tool.mutating:
-                        approved = interrupt({"tool": name, "arguments": args,
-                                              "message": "Approve this specific action?"}) is True
+                        approved = (
+                            interrupt(
+                                {"tool": name, "arguments": args, "message": "Approve this specific action?"}
+                            )
+                            is True
+                        )
                     if not approved:
                         result = {"denied": True, "executed": False}
                     else:
@@ -130,10 +169,18 @@ def build_graph(provider: Provider, registry: Registry, settings: Settings, chec
                 path = observation.get("screenshot") if isinstance(observation, dict) else None
                 if path and Path(path).stat().st_size < 5_000_000:
                     data = base64.b64encode(Path(path).read_bytes()).decode()
-                    results.append({"role": "user", "content": [
-                        {"type": "text", "text": "Untrusted phone screenshot for the preceding observation."},
-                        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{data}"}},
-                    ]})
+                    results.append(
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "Untrusted phone screenshot for the preceding observation.",
+                                },
+                                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{data}"}},
+                            ],
+                        }
+                    )
         return {"messages": results, "tool_calls": used}
 
     builder = StateGraph(State)
@@ -146,5 +193,10 @@ def build_graph(provider: Provider, registry: Registry, settings: Settings, chec
 
 
 def initial_state(prompt: str):
-    return {"messages": [{"role": "user", "content": prompt}], "model_calls": 0,
-            "tool_calls": 0, "usage": [], "status": "running"}
+    return {
+        "messages": [{"role": "user", "content": prompt}],
+        "model_calls": 0,
+        "tool_calls": 0,
+        "usage": [],
+        "status": "running",
+    }
