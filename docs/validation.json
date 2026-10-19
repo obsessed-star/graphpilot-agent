@@ -16,7 +16,7 @@
     {
       "command": "python -m pytest -q",
       "exit_code": 0,
-      "summary": "23 passed in 8.24s"
+      "summary": "23 passed in 6.33s"
     },
     {
       "command": "python -m build --outdir dist",
@@ -31,7 +31,7 @@
     },
     {
       "file": "graphpilot_agent-0.1.0.tar.gz",
-      "sha256": "19ae2648226d35401cf51091c478600febeed46fc9315fc25f7e07dadce1c259"
+      "sha256": "9aefc26b54961bb36c1fba3c5f8a78456858f6539c1989e042c683f8fe9f6dfc"
     }
   ],
   "live_provider_tested": false,
