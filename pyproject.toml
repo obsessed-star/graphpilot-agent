@@ -6,6 +6,8 @@ build-backend = "hatchling.build"
 name = "graphpilot-agent"
 version = "0.1.0"
 description = "A provider-neutral LangGraph agent with inspectable tool execution and Android control."
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.11"
 dependencies = ["langgraph>=1.0,<2", "langgraph-checkpoint-sqlite>=3,<4", "litellm>=1.80,<2", "python-dotenv>=1,<2", "jsonschema>=4,<5"]
 
@@ -14,6 +16,10 @@ dev = ["pytest>=8,<10", "ruff>=0.12,<1", "build>=1,<2"]
 
 [project.scripts]
 graphpilot = "graphpilot.cli:main"
+
+[project.urls]
+Repository = "https://github.com/obsessed-star/graphpilot-agent"
+Issues = "https://github.com/obsessed-star/graphpilot-agent/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/graphpilot"]

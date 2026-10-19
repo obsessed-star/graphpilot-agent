@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-19",
+  "platform": "Windows",
+  "python": "3.14.7",
+  "checks": [
+    {
+      "command": "python -m ruff check .",
+      "exit_code": 0,
+      "summary": "All checks passed!"
+    },
+    {
+      "command": "python -m ruff format --check .",
+      "exit_code": 0,
+      "summary": "15 files already formatted"
+    },
+    {
+      "command": "python -m pytest -q",
+      "exit_code": 0,
+      "summary": "23 passed in 6.86s"
+    },
+    {
+      "command": "python -m build --outdir dist",
+      "exit_code": 0,
+      "summary": "Successfully built graphpilot_agent-0.1.0.tar.gz and graphpilot_agent-0.1.0-py3-none-any.whl"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "graphpilot_agent-0.1.0-py3-none-any.whl",
+      "sha256": "b97b9b951835a4f5cf5489129afd8cd04229c4ce8997c0e9baf41e84e743221f"
+    },
+    {
+      "file": "graphpilot_agent-0.1.0.tar.gz",
+      "sha256": "80b1c45d6404ed859fc5fa21d0477745510d24f9c52ce6887174038bb4027edc"
+    }
+  ],
+  "live_provider_tested": false,
+  "real_usb_device_tested": false
+}
