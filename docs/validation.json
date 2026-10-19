@@ -11,12 +11,12 @@
     {
       "command": "python -m ruff format --check .",
       "exit_code": 0,
-      "summary": "15 files already formatted"
+      "summary": "16 files already formatted"
     },
     {
       "command": "python -m pytest -q",
       "exit_code": 0,
-      "summary": "23 passed in 6.86s"
+      "summary": "23 passed in 8.24s"
     },
     {
       "command": "python -m build --outdir dist",
@@ -31,7 +31,7 @@
     },
     {
       "file": "graphpilot_agent-0.1.0.tar.gz",
-      "sha256": "80b1c45d6404ed859fc5fa21d0477745510d24f9c52ce6887174038bb4027edc"
+      "sha256": "19ae2648226d35401cf51091c478600febeed46fc9315fc25f7e07dadce1c259"
     }
   ],
   "live_provider_tested": false,
