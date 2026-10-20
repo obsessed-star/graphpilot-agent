@@ -141,6 +141,10 @@ def add_phone_tools(registry: Registry, phone):
         "type_text": {"text": {"type": "string", "minLength": 1, "maxLength": 1000}},
         "key": {"key": {"type": "string", "enum": ["HOME", "BACK", "ENTER", "BACKSPACE", "RECENTS"]}},
         "launch": {"package": {"type": "string", "minLength": 3, "maxLength": 200}},
+        "open_url": {
+            "url": {"type": "string", "minLength": 1, "maxLength": 4096},
+            "package": {"type": "string", "maxLength": 200},
+        },
     }
     for action, properties in specs.items():
 
@@ -158,3 +162,24 @@ def add_phone_tools(registry: Registry, phone):
                 mutating=True,
             )
         )
+
+    def downloads():
+        from usbphone.downloads import list_downloads
+
+        return list_downloads(phone)
+
+    def export(name):
+        from usbphone.downloads import export_download
+
+        return export_download(phone, name)
+
+    registry.add(Tool("phone_list_downloads", "List public phone Downloads filenames.", obj({}), downloads))
+    registry.add(
+        Tool(
+            "phone_export_download",
+            "Copy a public phone download locally; verify byte count and SHA-256, not its meaning.",
+            obj({"name": {"type": "string", "minLength": 1, "maxLength": 180}}),
+            export,
+            mutating=True,
+        )
+    )

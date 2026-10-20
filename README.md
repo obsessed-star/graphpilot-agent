@@ -67,6 +67,11 @@ Install official [Android Platform Tools](https://developer.android.com/tools/re
 
 Text models receive UI labels and element coordinates. For screenshot reasoning, select a compatible vision model and enable `AGENT_VISION=true`. [Privacy and model requirements](docs/providers.md#groq-and-vision).
 
+Give an outcome such as "apply to this vacancy" or "retrieve this document from this site". The model
+chooses navigation and form steps from the current screen. Browser URL navigation and verified download
+export require USBPhone Control 0.2.0+. See [goal-driven phone tasks](docs/phone-goals.md) for examples,
+outcome evidence and current limits. Live site/device completion is not yet validated.
+
 ## Durable approval
 
 File writes and phone actions require approval. Reads do not. To pause for review without an interactive prompt:

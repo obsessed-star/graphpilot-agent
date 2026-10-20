@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 — 2026-10-20
+
+- Treat phone requests as user outcomes: application submission, document retrieval and contact calls.
+- Add phone URL navigation, public Downloads listing and byte-verified file export tools.
+- Define missing-information, unexpected-screen and final-outcome evidence behavior in the agent policy.
+- Add real graph/controller integration fixtures for application confirmation, denied submission and document export.
+- These fixtures test orchestration, not live model planning or compatibility with every website/device.
+
 ## 0.1.2 — 2026-10-20
 
 - Verify the actual Groq service: approval, SQLite resume, file write and read-back completed in three model requests and two tools with `openai/gpt-oss-20b`.

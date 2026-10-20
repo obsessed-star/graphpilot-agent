@@ -1,3 +1,3 @@
 """GraphPilot: provider-neutral, observable tool use built on LangGraph."""
 
-__version__ = "0.1.2"
+__version__ = "0.2.0"
