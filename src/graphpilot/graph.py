@@ -112,7 +112,9 @@ def build_graph(provider: Provider, registry: Registry, settings: Settings, chec
                     "messages": [
                         {
                             "role": "assistant",
-                            "content": "Model görünür yanıt veya araç çağrısı döndürmedi; görev tamamlanmadı.",
+                            "content": (
+                                "Model görünür yanıt veya araç çağrısı döndürmedi; görev tamamlanmadı."
+                            ),
                         }
                     ],
                 }

@@ -32,11 +32,11 @@
   "artifacts": [
     {
       "file": "graphpilot_agent-0.1.2-py3-none-any.whl",
-      "sha256": "a95beb4ee6439a8b071e18cc7710be90a6f7185d7a039102f6daa02c1d0976ba"
+      "sha256": "1c3260c9e111c3bcfa1a1e7901dbbd0b12dc8c24276bd57c6c5bf3f8b7102ed5"
     },
     {
       "file": "graphpilot_agent-0.1.2.tar.gz",
-      "sha256": "370846b8ccba9eb7cf07598fc243529e3570a374c9b941116de023e7ff55d9f7"
+      "sha256": "f6d21485f8962a177b22224aed03a4a95b97a4e4cf7d104704c3ddebd6d78096"
     }
   ],
   "live_provider_tested": true,
