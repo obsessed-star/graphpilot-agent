@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-20T19:02:47.636545+03:00",
+  "credential_saved": false,
+  "model_requests": 3,
+  "passed": true,
+  "model": "openai/gpt-oss-20b",
+  "approval_blocked_write": true,
+  "provider": "Groq",
+  "agent_status": "completed",
+  "tool_calls": 2,
+  "sqlite_resume": true,
+  "file_content_verified": true,
+  "read_tool_verified": true,
+  "usage": [
+    {
+      "completion_tokens": 311,
+      "prompt_tokens": 497,
+      "total_tokens": 808,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": null,
+        "reasoning_tokens": 278,
+        "rejected_prediction_tokens": null,
+        "text_tokens": null,
+        "image_tokens": null,
+        "video_tokens": null
+      },
+      "prompt_tokens_details": null,
+      "queue_time": 0.607333799,
+      "prompt_time": 0.028088033,
+      "completion_time": 0.352036197,
+      "total_time": 0.38012423
+    },
+    {
+      "completion_tokens": 40,
+      "prompt_tokens": 550,
+      "total_tokens": 590,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": null,
+        "reasoning_tokens": 19,
+        "rejected_prediction_tokens": null,
+        "text_tokens": null,
+        "image_tokens": null,
+        "video_tokens": null
+      },
+      "prompt_tokens_details": null,
+      "queue_time": 0.20818559,
+      "prompt_time": 0.034302912,
+      "completion_time": 0.043864648,
+      "total_time": 0.07816756
+    },
+    {
+      "completion_tokens": 132,
+      "prompt_tokens": 594,
+      "total_tokens": 726,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": null,
+        "reasoning_tokens": 101,
+        "rejected_prediction_tokens": null,
+        "text_tokens": null,
+        "image_tokens": null,
+        "video_tokens": null
+      },
+      "prompt_tokens_details": null,
+      "queue_time": 0.087720822,
+      "prompt_time": 0.035385106,
+      "completion_time": 0.14236282,
+      "total_time": 0.177747926
+    }
+  ],
+  "physical_device_tested": false,
+  "previous_default_available": false,
+  "previous_default": "llama-3.3-70b-versatile",
+  "tested_output_token_budget": 1024
+}

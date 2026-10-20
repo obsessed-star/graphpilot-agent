@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Settings:
-    model: str = "groq/llama-3.3-70b-versatile"
+    model: str = "groq/openai/gpt-oss-20b"
     api_base: str | None = None
     api_key_env: str | None = None
     vision: bool = False

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2 — 2026-10-20
+
+- Verify the actual Groq service: approval, SQLite resume, file write and read-back completed in three model requests and two tools with `openai/gpt-oss-20b`.
+- Update the default model to the live-verified model; the prior default was not listed for the test credential.
+- Preserve provider finish reasons. Token-truncated reasoning responses now stop as `output_limit` instead of false completion, without executing partial tool calls.
+- Reject empty visible responses as `empty_response`; both failure states return CLI exit status 2.
+- Add unit and real-HTTP regression coverage; no credential is persisted or included in evidence.
+
 ## 0.1.1 — 2026-10-20
 
 - Exercise the real CLI/LiteLLM HTTP boundary for approval, denial, persistence, authentication and rate-limit failures.

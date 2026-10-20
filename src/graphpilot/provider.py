@@ -65,4 +65,8 @@ class LiteLLMProvider:
         normalized.setdefault("role", "assistant")
         normalized.setdefault("content", None)
         usage = result.usage.model_dump() if result.usage else {}
-        return {"message": normalized, "usage": usage}
+        return {
+            "message": normalized,
+            "usage": usage,
+            "finish_reason": getattr(result.choices[0], "finish_reason", None),
+        }

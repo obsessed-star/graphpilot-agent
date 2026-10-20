@@ -49,7 +49,7 @@ python -m graphpilot.cli doctor
 python -m graphpilot.cli run "Create a short task checklist in checklist.txt" --session checklist
 ```
 
-The default is `groq/llama-3.3-70b-versatile`. No key belongs in source code, a command argument, an issue or a public screenshot. `doctor` reports presence only and does not call a model.
+The default is `groq/openai/gpt-oss-20b`, verified against Groq on 20 October 2026. Keep `AGENT_MAX_TOKENS=1024` or choose a sufficient reasoning/output budget; exhausted or empty responses fail explicitly. No key belongs in source code, a command argument, an issue or a public screenshot. `doctor` reports presence only and does not call a model.
 
 For Anthropic, Gemini, OpenAI, Ollama and compatible gateways, change `AGENT_MODEL` and provider environment variables. See [provider configuration](docs/providers.md). Compatibility depends on the selected model's tool/image support; live tests across every provider are not claimed.
 
@@ -100,12 +100,12 @@ python -m pytest -q
 python -m build
 ```
 
-The integration test uses the actual phone controller over a deterministic USB transport fixture. It skips when the companion package is absent. Local HTTP integration tests also run real CLI processes and the LiteLLM adapter through approval/resume and 401/429 failures, using scripted responses. CI includes a cross-repository integration job and Windows/Linux × Python 3.11/3.14 package checks. No API key or hardware is needed for CI. Use version 0.1.1 or newer; the [validation record](docs/validation.md) documents defects found after the initial unit-only preview.
+The integration test uses the actual phone controller over a deterministic USB transport fixture. It skips when the companion package is absent. Local HTTP integration tests also run real CLI processes and the LiteLLM adapter through approval/resume, 401/429 failures and truncated/empty reasoning output, using scripted responses. CI includes a cross-repository integration job and Windows/Linux × Python 3.11/3.14 package checks. No API key or hardware is needed for CI. Use version 0.1.2 or newer; the [validation record](docs/validation.md) documents defects found after the initial unit-only preview.
 
 [Architecture and tradeoffs](docs/architecture.md) · [Validation evidence](docs/validation.md) · [Security](SECURITY.md) · [Türkçe başlangıç](docs/tr.md)
 
 ## Current scope
 
-This is a local, single-user pilot. Live Groq behavior and real USB-device control still require operator-provided credentials and hardware validation. Automated tests and scripted demos are identified as such. No hosted multi-user service, arbitrary PC shell, browser automation, autonomous purchase flow or distributed device locking is shipped.
+This is a local, single-user pilot. A live Groq run verified approval, SQLite resume, file writing and file read-back in three model requests and two tool executions; see the [sanitized evidence](docs/live-groq-2026-10-20.json). The credential was used transiently and was not saved. Real USB-device control still requires physical hardware validation. Other providers have not all been tested live. Automated fixtures and live evidence are identified separately. No hosted multi-user service, arbitrary PC shell, browser automation, autonomous purchase flow or distributed device locking is shipped.
 
 Development uses AI assistance. Commits record actual implementation, tests and fixes in order; activity is not backdated.

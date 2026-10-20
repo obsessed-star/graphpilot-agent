@@ -87,7 +87,35 @@ def build_graph(provider: Provider, registry: Registry, settings: Settings, chec
             message = response["message"]
             if message.get("role") != "assistant":
                 raise ValueError("Provider did not return an assistant message")
+            finish_reason = response.get("finish_reason")
+            if finish_reason in {"length", "max_tokens"}:
+                # Reasoning-only output can exhaust its budget without visible text.
+                # Never persist/execute an incomplete tool envelope as a successful turn.
+                return {
+                    "model_calls": state["model_calls"] + 1,
+                    "status": "output_limit",
+                    "usage": [response.get("usage", {})],
+                    "messages": [
+                        {
+                            "role": "assistant",
+                            "content": "Model çıktı sınırına ulaştı; görev tamamlanmadı. "
+                            "AGENT_MAX_TOKENS değerini modelin reasoning bütçesine göre artırın.",
+                        }
+                    ],
+                }
             calls = message.get("tool_calls") or []
+            if not calls and not message.get("content"):
+                return {
+                    "model_calls": state["model_calls"] + 1,
+                    "status": "empty_response",
+                    "usage": [response.get("usage", {})],
+                    "messages": [
+                        {
+                            "role": "assistant",
+                            "content": "Model görünür yanıt veya araç çağrısı döndürmedi; görev tamamlanmadı.",
+                        }
+                    ],
+                }
             if not isinstance(calls, list) or len(calls) > 16:
                 raise ValueError("Invalid tool-call envelope")
             for call in calls:

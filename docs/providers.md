@@ -4,7 +4,7 @@ GraphPilot uses [LiteLLM's completion interface](https://docs.litellm.ai/docs/) 
 
 | Provider | Example `AGENT_MODEL` | Key variable | Notes |
 |---|---|---|---|
-| Groq | `groq/llama-3.3-70b-versatile` | `GROQ_API_KEY` | Initial text/tool configuration; uses the Android UI tree |
+| Groq | `groq/openai/gpt-oss-20b` | `GROQ_API_KEY` | Live-verified text/tool configuration; uses the Android UI tree |
 | Anthropic | `anthropic/<available-model>` | `ANTHROPIC_API_KEY` | Select an accessible tool-capable model |
 | Gemini | `gemini/<available-model>` | `GEMINI_API_KEY` | Model availability depends on your account |
 | OpenAI | `openai/<available-model>` | `OPENAI_API_KEY` | Set an actual accessible model ID |
@@ -28,6 +28,8 @@ Save the key privately with `python -m graphpilot.cli configure --key-env MY_GAT
 
 ## Groq and vision
 
-The default model is a text model. It sees UI element labels, bounds and centers, rather than screenshot pixels. Screenshot files are still captured locally. To use visual reasoning, select a currently available [Groq vision model](https://console.groq.com/docs/models) and set `AGENT_VISION=true`. Do not assume any listed model remains available indefinitely. Unsupported tool/image combinations fail explicitly; the agent does not silently fall back to a paid model.
+The default model is a text/reasoning model. It sees UI element labels, bounds and centers, rather than screenshot pixels. Screenshot files are still captured locally. Reasoning consumes the output token budget even before visible text or tools are produced. A `length`/`max_tokens` finish is reported as `output_limit`; an empty turn is `empty_response`. Both return CLI status 2 and are never reported as successful work. Adjust `AGENT_MAX_TOKENS` deliberately; the agent does not retry or increase spending automatically.
+
+To use visual reasoning, select a currently available [Groq vision model](https://console.groq.com/docs/models) and set `AGENT_VISION=true`. Do not assume any listed model remains available indefinitely. The previous Llama default was absent from the test key's model list on 20 October 2026, so the shipped default now matches the live-verified model. Model access remains account-specific. Unsupported tool/image combinations fail explicitly; the agent does not silently fall back to a paid model.
 
 Screen contents are transmitted to your chosen provider when its tool results are used; vision mode also transmits the latest screenshot. Use a test device and non-sensitive screens for a public demo. Actual phone captures and session databases stay ignored locally.

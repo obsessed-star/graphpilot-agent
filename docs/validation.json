@@ -2,14 +2,14 @@
   "date": "2026-10-20",
   "platform": "Windows",
   "python": "3.14.7",
-  "version": "0.1.1",
-  "project_test_cases": 27,
+  "version": "0.1.2",
+  "project_test_cases": 34,
   "checks": [
     {
       "command": "python -m pytest outputs/graphpilot-agent/tests outputs/usbphone-control/tests -q",
       "command_root": "directory containing outputs",
       "exit_code": 0,
-      "summary": "58 passed in 62.01s; real HTTP/CLI and MCP transport included"
+      "summary": "65 passed in 63.89s; real HTTP/CLI, output limits and MCP transport included"
     },
     {
       "command": "ruff check outputs/graphpilot-agent outputs/usbphone-control",
@@ -31,16 +31,19 @@
   ],
   "artifacts": [
     {
-      "file": "graphpilot_agent-0.1.1-py3-none-any.whl",
-      "sha256": "92b40eff541869a3d5ee248462594abfd28b22a4c6fb75e2a0c55013f08ccb61"
+      "file": "graphpilot_agent-0.1.2-py3-none-any.whl",
+      "sha256": "a95beb4ee6439a8b071e18cc7710be90a6f7185d7a039102f6daa02c1d0976ba"
     },
     {
-      "file": "graphpilot_agent-0.1.1.tar.gz",
-      "sha256": "3d633e2a934b229859640e57b8ef243ae1d6d44db6e8b5f099abfccf5651984b"
+      "file": "graphpilot_agent-0.1.2.tar.gz",
+      "sha256": "370846b8ccba9eb7cf07598fc243529e3570a374c9b941116de023e7ff55d9f7"
     }
   ],
-  "live_provider_tested": false,
+  "live_provider_tested": true,
   "real_usb_device_tested": false,
   "local_http_adapter_tested": true,
-  "mcp_sdk": "2.3.0"
+  "mcp_sdk": "2.3.0",
+  "live_provider_evidence": "live-groq-2026-10-20.json",
+  "live_model": "groq/openai/gpt-oss-20b",
+  "credential_saved": false
 }

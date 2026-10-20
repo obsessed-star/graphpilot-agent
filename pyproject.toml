@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "graphpilot-agent"
-version = "0.1.1"
+version = "0.1.2"
 description = "A provider-neutral LangGraph agent with inspectable tool execution and Android control."
 readme = "README.md"
 license = "MIT"

@@ -66,6 +66,9 @@ def local_api():
                 ],
                 "usage": {"prompt_tokens": 10, "completion_tokens": 10, "total_tokens": 20},
             }
+            if settings.get("empty_output"):
+                response["choices"][0]["message"] = {"role": "assistant", "content": None}
+                response["choices"][0]["finish_reason"] = settings.get("finish_reason", "stop")
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
@@ -77,7 +80,7 @@ def local_api():
     env = PrivateEnvironment(
         {
             **os.environ,
-            "AGENT_MODEL": "groq/llama-3.3-70b-versatile",
+            "AGENT_MODEL": "groq/openai/gpt-oss-20b",
             "AGENT_API_BASE": f"http://127.0.0.1:{server.server_port}/openai/v1",
             "AGENT_API_KEY_ENV": "LOCAL_TEST_KEY",
             "LOCAL_TEST_KEY": "local-fixture-only",
@@ -135,3 +138,14 @@ def test_http_failure_has_nonzero_cli_exit_without_retries(tmp_path, local_api, 
     assert '"status": "provider_error"' in result.stdout
     assert len(requests) == 1  # No hidden retries or external provider requests.
     assert result.returncode == 2
+
+
+@pytest.mark.parametrize("reason,expected", [("length", "output_limit"), ("stop", "empty_response")])
+def test_http_reasoning_without_visible_output_is_not_success(tmp_path, local_api, reason, expected):
+    env, requests, settings = local_api
+    settings.update(empty_output=True, finish_reason=reason)
+    result = invoke(tmp_path, env, "run", "write a file", "--non-interactive")
+    assert result.returncode == 2
+    assert f'"status": "{expected}"' in result.stdout
+    assert len(requests) == 1
+    assert not (tmp_path / "workspace" / "result.txt").exists()
